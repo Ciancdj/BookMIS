@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="model.mapper.BooksMapper">
+    	<!-- 中介映射转换 -->
+    	<resultMap type="Books" id="BooksRM">
+    		<!-- 主键映射 -->
+    		<id property="bookid" column="bookId" />
+ 			<!-- 普通字段映射 -->
+ 			<result property="bookname" column="bookName" />
+ 			<result property="bookauthor" column="bookAuthor" />
+ 			<result property="bookintro" column="bookIntro" />
+ 			<result property="bookclassifyid" column="bookRegion" />
+ 			<result property="bookprice" column="price" />
+ 			<result property="bookclassify" column="regionName" />
+ 			<result property="bookpress" column="pressName" />
+ 			<!-- power属性两边字段一致不添加 -->
+    	</resultMap>
+    	
+    	<select id="get" parameterType="java.lang.Integer" resultMap="BooksRM" >
+				select bookId,bookName,bookAuthor,bookIntro,bookRegion,price,regionName,pressName from book, region_select, press
+			where region_select.regionID = book.bookRegion  and book.pressID = press.pressID and bookId = #{bookid}
+    	</select>
+		
+		<update id="update" parameterType="Couple" >
+		    update book_next set bookstate=#{amount,jdbcType=INTEGER} where bookCode=#{defination,jdbcType=VARCHAR}    
+		</update>
+		
+		<insert id="add" parameterType="Borrows">
+			insert into borrow(bookID, userID, borrowTime)
+    			values(#{bookcode}, #{userid}, #{borrowerdate})
+		</insert>
+    	
+    	<delete id="delete" parameterType="Couple">
+    		delete from borrow where bookID=#{defination,jdbcType=VARCHAR} and userID=#{amount,jdbcType=INTEGER}
+    	</delete>
+    	
+    </mapper>

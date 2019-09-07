@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="model.mapper.ListsMapper">
+    	<!-- 中介映射转换 -->
+    	<resultMap type="Lists" id="ListsRM">
+    		<!-- 主键映射 -->
+    		<id property="id" column="userID" />
+ 			<!-- 普通字段映射 -->
+ 			<result property="bookid" column="BookId" />
+ 			<result property="bookname" column="bookName" />
+ 			<result property="bookauthor" column="bookAuthor" />
+ 			<result property="bookindex" column="bookIndex" />
+ 			<result property="bookpress" column="pressName" />
+ 			<result property="booknum" column="count(bookID)" />
+ 			<result property="borrowable" column="count(bookstate)" />
+ 			<result property="regioname" column="regionName" />
+ 			<result property="bookposition" column="bookRegionID" />
+ 			<!-- power属性两边字段一致不添加 -->
+    	</resultMap>
+    	
+    	<select id="searchByName" parameterType="String" resultMap="ListsRM">
+ 				select bookID, bookName, bookAuthor, pressName, bookIndex, bookRegionID, regionName, count(bookID), count(bookstate) from 
+			(select book.bookID,bookName,bookAuthor, press.pressName, bookIndex, bookstate, regionName, bookRegionID from book,
+			book_next, press, region_select where book.bookId = book_next.bookID and book.pressID = press.pressID
+ 			and bookRegion = regionID and bookName like concat('%',#{searching},'%')) as a group by bookID;
+        </select>
+        
+        <select id="searchBySonRegion" parameterType="String" resultMap="ListsRM">
+        		select bookID, bookName, bookAuthor, pressName, bookIndex, bookRegionID, regionName, count(bookID), count(bookstate) from (select 
+			book.bookID,bookName,bookAuthor,press.pressName, bookIndex, bookstate, regionName, bookRegionID from book, book_next, press, 
+			region_select where book.bookId = book_next.bookID and book.pressID = press.pressID and bookRegion = regionID
+			and bookRegion = (select regionID from region_select where regionName = #{region})) as a group by bookID;
+        </select>
+        
+        <select id="searchByParentRegion" parameterType="String" resultMap="ListsRM">
+				select bookID, bookName, bookAuthor, pressName, bookIndex, bookRegionID, regionName, count(bookID), count(bookstate) from (select 
+			book.bookID,bookName,bookAuthor, press.pressName, bookIndex, bookstate, regionName, bookRegionID from book, book_next, press,
+			region_select  where book.bookId = book_next.bookID and book.pressID = press.pressID and bookRegion = regionID
+			and bookRegion in (select regionID from region_select where ParentID = #{region})) as a group by bookID;
+        </select>
+        
+        <select id="searchByPress" parameterType="String" resultMap="ListsRM">
+				select bookID, bookName, bookAuthor, pressName, bookIndex, bookRegionID, regionName, count(bookID), count(bookstate) from (select 
+			book.bookID,bookName,bookAuthor,press.pressName, bookIndex, bookstate, regionName, bookRegionID from book, book_next, press,
+			region_select where book.bookId = book_next.bookID and book.pressID = press.pressID and bookRegion = regionID
+			and pressName = #{press}) as a group by bookID;
+        </select>
+        
+        
+    </mapper>

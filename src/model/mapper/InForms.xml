@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="model.mapper.InFormsMapper">
+    	<!-- 中介映射转换 -->
+    	<resultMap type="InForms" id="InFormsRM">
+    		<!-- 主键映射 -->
+    		<id property="bookcode" column="bookCode" />
+ 			<!-- 普通字段映射 -->
+ 			<result property="bookindex" column="bookIndex" />
+ 			<result property="bookregion" column="bookRegionID" />
+    	</resultMap>
+    	
+    	<select id="listAll" parameterType="java.lang.Integer" resultMap="InFormsRM" >
+    		select bookCode,bookIndex,bookRegionID,bookstate from book_next where bookID = #{bookid}
+    	</select>
+
+		<select id="state" parameterType="String" resultMap="InFormsRM">
+			SELECT bookstate FROM book_next where bookCode = #{bookcode};
+    	</select>
+
+    </mapper>

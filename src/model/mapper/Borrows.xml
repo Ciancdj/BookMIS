@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="model.mapper.BorrowsMapper">
+    	<!-- 中介映射转换 -->
+    	<resultMap type="Borrows" id="BorrowsRM">
+    		<!-- 主键映射 -->
+    		<id property="id" column="userID" />
+ 			<!-- 普通字段映射 -->
+ 			<result property="bookcode" column="bookCode" />
+ 			<result property="bookname" column="bookName" />
+ 			<result property="bookauthor" column="bookAuthor" />
+ 			<result property="borrowername" column="borrowerName" />
+ 			<result property="borrowerphone" column="borrowerPhone" />
+ 			<result property="borrowerdate" column="borrowTime" />
+ 			<result property="freeday" column="freeDay" />
+ 			<!-- power属性两边字段一致不添加 -->
+    	</resultMap>    
+        
+        <select id="get" parameterType="java.lang.Integer" resultMap="BorrowsRM" >
+    			select bookCode, bookName, bookAuthor from book_next, book where book_next.bookID = book.bookID 
+			and bookCode in (select bookID from borrow where userID = #{userid});
+    	</select>
+        
+        <select id="adminList" parameterType="java.lang.Integer" resultMap="BorrowsRM" >
+    			select bookCode, bookName, bookAuthor,borrowerName,borrowerPhone,borrowTime, freeDay
+			from borrow, book_next, book, users, users_information,fine where book_next.bookID = book.bookID 
+			and book_next.bookCode = borrow.bookID and users.userID = users_information.userID
+			and fine.power = users.power and borrow.userID = users.userID;
+    	</select>
+        
+    </mapper>
