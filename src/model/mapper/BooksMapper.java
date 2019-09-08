@@ -1,5 +1,6 @@
 package model.mapper;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.stereotype.Repository;
 
 import model.pojo.Books;

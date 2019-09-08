@@ -24,14 +24,14 @@ import java.security.NoSuchAlgorithmException;
 public class UsersController {
 	@Autowired
 	UsersService usersService;
-	 
+
 	@RequestMapping(value="/login")
 	public ModelAndView LoginView() {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("Login");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/listUsers")
 	public ModelAndView listUsers() {
 		ModelAndView mav = new ModelAndView();
@@ -40,7 +40,7 @@ public class UsersController {
 		mav.setViewName("listUsers");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/login/Testing")
 	public ModelAndView LoginTesting(Users input, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
@@ -50,15 +50,15 @@ public class UsersController {
 		String password = input.getPassword();
 		// System.out.println(account + "  " + password);
 		Users user = usersService.get(account);
-		if(user == null) {		// Ã»ÓĞÍ¨¹ıĞÕÃûÕÒµ½¶ÔÓ¦Ïî
-			mav.addObject("msg1", "¸ÃÕËºÅ²»´æÔÚ£¬ÇåÏÈ×¢²á");
+		if(user == null) {		// æ²¡æœ‰é€šè¿‡å§“åæ‰¾åˆ°å¯¹åº”é¡¹
+			mav.addObject("msg1", "è¯¥è´¦å·ä¸å­˜åœ¨ï¼Œæ¸…å…ˆæ³¨å†Œ");
 		}
 		if(user != null && password == null) {
-			mav.addObject("msg2", "ÃÜÂë²»ÄÜÎª¿Õ");
+			mav.addObject("msg2", "å¯†ç ä¸èƒ½ä¸ºç©º");
 		}
 		password = MD5(password);
 		if(user != null && !user.getPassword().equals(password)) {
-			mav.addObject("msg2", "ÃÜÂë´íÎó£¬ÇëÖØĞÂÊä³ö");
+			mav.addObject("msg2", "å¯†ç é”™è¯¯ï¼Œè¯·é‡æ–°è¾“å‡º");
 		}
 		if(user != null && user.getPassword().equals(password)){
 			mav.addObject("user", user);
@@ -75,12 +75,12 @@ public class UsersController {
 		}
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/register")
 	public String RegisterView() {
 		return "Register";
 	}
-	
+
 	@RequestMapping(value="/login/outlogin")
 	public ModelAndView OutLogin(HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView("redirect:/search");
@@ -88,7 +88,7 @@ public class UsersController {
 		session.setAttribute("holdingUsers", null);
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/register/Testing")
 	public ModelAndView RegisterTesting(Users input, String lastname, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
@@ -99,23 +99,23 @@ public class UsersController {
 		mav.addObject("msg5", "");
 		boolean isNull = false;
 		if(lastname == null) {
-			mav.addObject("msg2", "ĞÕÃûÎª¿Õ£¬ÇëÖØĞÂÌîĞ´");
+			mav.addObject("msg2", "å§“åä¸ºç©ºï¼Œè¯·é‡æ–°å¡«å†™");
 			isNull = true;
 		}
 		if(input.getUsersname() == null) {
-			mav.addObject("msg1", "ĞÕÊÏÎª¿Õ£¬ÇëÖØĞÂÌîĞ´");
+			mav.addObject("msg1", "å§“æ°ä¸ºç©ºï¼Œè¯·é‡æ–°å¡«å†™");
 			isNull = true;
 		}
 		if(input.getAccount() == null) {
-			mav.addObject("msg3", "ÕË»§Îª¿Õ£¬ÇëÖØĞÂÌîĞ´");
+			mav.addObject("msg3", "è´¦æˆ·ä¸ºç©ºï¼Œè¯·é‡æ–°å¡«å†™");
 			isNull = true;
 		}
 		if(input.getPassword() == null) {
-			mav.addObject("msg4", "ÃÜÂëÎª¿Õ£¬ÇëÖØĞÂÌîĞ´");
+			mav.addObject("msg4", "å¯†ç ä¸ºç©ºï¼Œè¯·é‡æ–°å¡«å†™");
 			isNull = true;
 		}
 		if(input.getUsersphone() == null) {
-			mav.addObject("msg5", "µç»°ºÅÂëÎª¿Õ£¬ÇëÖØĞÂÌîĞ´");
+			mav.addObject("msg5", "ç”µè¯å·ç ä¸ºç©ºï¼Œè¯·é‡æ–°å¡«å†™");
 			isNull = true;
 		}
 		if(isNull) {
@@ -125,10 +125,10 @@ public class UsersController {
 		input.setUsersname(input.getUsersname() + lastname);
 		Users users = usersService.get(input.getAccount());
 		if (users != null) {
-			mav.addObject("msg3", "¸ÃÕË»§ÒÑ±»×¢²á£¬ÇëÖØĞÂÌîĞ´");
+			mav.addObject("msg3", "è¯¥è´¦æˆ·å·²è¢«æ³¨å†Œï¼Œè¯·é‡æ–°å¡«å†™");
 			mav.setViewName("redirect:/register");
 			return mav;
-		} 
+		}
 		input.setPower(3);
 		input.setPassword(MD5(input.getPassword()));
 		usersService.add(input);
@@ -142,32 +142,32 @@ public class UsersController {
 		mav.setViewName("SuccessRegister");
 		return mav;
 	}
-	
+
 	private String MD5(String input) {
 		char[] chars = new char[] { '0', '1', '2', '3', '4', '5',
-                 '6', '7' , '8', '9', 'A', 'B', 'C', 'D', 'E','F' };
+				'6', '7' , '8', '9', 'A', 'B', 'C', 'D', 'E','F' };
 		StringBuffer output = null;
 		try {
-			 MessageDigest md5 = MessageDigest.getInstance("md5");
-			 byte[] b = input.getBytes();
-			 byte[] digest = md5.digest(b);
-			 output = new StringBuffer();
-			 for (byte bb : digest) {
-				 output.append(chars[(bb >> 4) & 15]);
-				 output.append(chars[bb & 15]);
-	         }
+			MessageDigest md5 = MessageDigest.getInstance("md5");
+			byte[] b = input.getBytes();
+			byte[] digest = md5.digest(b);
+			output = new StringBuffer();
+			for (byte bb : digest) {
+				output.append(chars[(bb >> 4) & 15]);
+				output.append(chars[bb & 15]);
+			}
 		} catch (NoSuchAlgorithmException e) {
-			 e.printStackTrace();
+			e.printStackTrace();
 		}
 		return output.toString();
 	}
-	
+
 	@RequestMapping(value="/InformChange")
 	public ModelAndView ChangeInform(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("InformInstall");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/InformChange/input")
 	public ModelAndView ChangeInformInput(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("ReturnPage");
@@ -176,7 +176,7 @@ public class UsersController {
 		String nowchangename = req.getParameter("nowchangename");
 		String nowchangephone = req.getParameter("nowchangephone");
 		if((changename.equals("") && changephone.equals("")) || (changename == null && changephone == null)) {
-			mav.addObject("returnInformation", "ĞÅÏ¢ĞŞ¸ÄÊ§°Ü, ÄÚÈİÁ½´¦¶¼Îª¿Õ£¬½«·µ»ØÎÒµÄÍ¼Êé¹İÒ³Ãæ");
+			mav.addObject("returnInformation", "ä¿¡æ¯ä¿®æ”¹å¤±è´¥, å†…å®¹ä¸¤å¤„éƒ½ä¸ºç©ºï¼Œå°†è¿”å›æˆ‘çš„å›¾ä¹¦é¦†é¡µé¢");
 			mav.addObject("returnUrl", "../MyLibrary");
 			return mav;
 		}
@@ -192,17 +192,17 @@ public class UsersController {
 		user.setUsersname(changename);
 		user.setUsersphone(changephone);
 		usersService.updataInform(user);
-		mav.addObject("returnInformation", "ĞÅÏ¢ĞŞ¸Ä³É¹¦,½«ÍË³öµÇÂ½²¢·µ»ØÊ×Ò³");
+		mav.addObject("returnInformation", "ä¿¡æ¯ä¿®æ”¹æˆåŠŸ,å°†é€€å‡ºç™»é™†å¹¶è¿”å›é¦–é¡µ");
 		mav.addObject("returnUrl", "../login/outlogin");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/changePassword")
 	public ModelAndView ChangePassword(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("PasswordInstall");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/changePassword/input")
 	public ModelAndView ChangePasswordInput(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("ReturnPage");
@@ -210,21 +210,21 @@ public class UsersController {
 		nowPassword = MD5(nowPassword);
 		int id = Integer.parseInt(req.getParameter("id"));
 		if (!usersService.checkPassword(id, nowPassword)) {
-			mav.addObject("returnInformation", "ÃÜÂë´íÎó£¬½«·µ»ØÃÜÂëĞŞ¸Ä½çÃæ");
+			mav.addObject("returnInformation", "å¯†ç é”™è¯¯ï¼Œå°†è¿”å›å¯†ç ä¿®æ”¹ç•Œé¢");
 			mav.addObject("returnUrl", "../changePassword");
 			return mav;
-		} 
+		}
 		String changePassword = req.getParameter("changePassword");
 		changePassword = MD5(changePassword);
 		Users user = new Users();
 		user.setId(id);
 		user.setPassword(changePassword);
 		usersService.updataPassword(user);
-		mav.addObject("returnInformation", "ÃÜÂëĞŞ¸Ä³É¹¦£¬½«ÍË³öµÇÂ½²¢·µ»ØÊ×Ò³");
+		mav.addObject("returnInformation", "å¯†ç ä¿®æ”¹æˆåŠŸï¼Œå°†é€€å‡ºç™»é™†å¹¶è¿”å›é¦–é¡µ");
 		mav.addObject("returnUrl", "../login/outlogin");
 		return mav;
 	}
-	
+
 //	@RequestMapping(value="/login/success")
 //	public ModelAndView Loginsuccess(Users user, HttpServletRequest request) {
 //		ModelAndView mav = new ModelAndView();
@@ -236,7 +236,7 @@ public class UsersController {
 //		return mav;
 //	}
 
-	
+
 //	@RequestMapping(value="/register/success")
 //	public ModelAndView Registersuccess(Users user, HttpServletRequest request) {
 //		ModelAndView mav = new ModelAndView();

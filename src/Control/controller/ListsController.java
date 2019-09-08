@@ -22,19 +22,19 @@ import model.service.ListsService;
 
 @Controller
 public class ListsController {
-	
+
 	@Autowired
 	ListsService listsService;
-	
+
 	@RequestMapping(value="/result")
 	public ModelAndView getResult(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
 		String way = req.getParameter("ways");
 		String input = req.getParameter("input");
 		if (way != null && input != null) {
-			if(way.equals("ÈÎÒâ´Ê")) {
+			if(way.equals("ä»»æ„è¯")) {
 				way = "Name";
-			} else if(way.equals("³ö°æÉç")) {
+			} else if(way.equals("å‡ºç‰ˆç¤¾")) {
 				way = "Region";
 			}
 			mav.addObject("method", way);
@@ -45,14 +45,14 @@ public class ListsController {
 				return mav;
 			int len = list.size();
 			mav.addObject("listLen", len);
-			List<Couple> regionInfor = new ArrayList<Couple>(); 
+			List<Couple> regionInfor = new ArrayList<Couple>();
 			Map<String, String> mapregion = new HashMap<String, String>();
-			List<Couple> positionInfor = new ArrayList<Couple>(); 
+			List<Couple> positionInfor = new ArrayList<Couple>();
 			Map<String, String> mapposition = new HashMap<String, String>();
-			List<Couple> pressInfor = new ArrayList<Couple>(); 
+			List<Couple> pressInfor = new ArrayList<Couple>();
 			Map<String, String> mappress = new HashMap<String, String>();
 			for(Lists alone: list) {
-				// ¼ÇÂ¼·ÖÀà´ÊÓë·ÖÀàÊıÁ¿
+				// è®°å½•åˆ†ç±»è¯ä¸åˆ†ç±»æ•°é‡
 				String Sindex = mapregion.get(alone.getRegioname());
 				int index = 0;
 				if(Sindex == null) {
@@ -65,7 +65,7 @@ public class ListsController {
 					tem.setAmount(tem.getAmount()+1);
 					regionInfor.set(index, tem);
 				}
-				// ¼ÇÂ¼¹Ü²ØµØÓë·Ö²¼ÊıÁ¿
+				// è®°å½•ç®¡è—åœ°ä¸åˆ†å¸ƒæ•°é‡
 				Sindex = mapposition.get(alone.getBookposition());
 				index = 0;
 				if(Sindex == null) {
@@ -78,7 +78,7 @@ public class ListsController {
 					tem.setAmount(tem.getAmount()+1);
 					positionInfor.set(index, tem);
 				}
-				// ¼ÇÂ¼³ö°æÉçÓë¶ÔÓ¦ÊıÁ¿
+				// è®°å½•å‡ºç‰ˆç¤¾ä¸å¯¹åº”æ•°é‡
 				Sindex = mappress.get(alone.getBookpress());
 				index = 0;
 				if(Sindex == null) {
@@ -99,12 +99,12 @@ public class ListsController {
 			mav.addObject("positionsize", positionInfor.size());
 			mav.addObject("presssize", pressInfor.size());
 		} else {
-			mav.addObject("errorType", "ĞÅÏ¢À¸Îª¿Õ£¡");
+			mav.addObject("errorType", "ä¿¡æ¯æ ä¸ºç©ºï¼");
 			mav.setViewName("index");
 		}
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/getList")
 	public ModelAndView getList(HttpServletRequest req) {
 		int limitPage = 9;
@@ -121,7 +121,7 @@ public class ListsController {
 			int maxPage;
 			int tempLen = len - 1;
 			if(tempLen % limitPage == 0) {
-				maxPage = tempLen / limitPage; 
+				maxPage = tempLen / limitPage;
 			} else {
 				maxPage = (tempLen / limitPage) + 1;
 			}
@@ -147,7 +147,7 @@ public class ListsController {
 		}
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/getList/page")
 	public ModelAndView switchPage(HttpServletRequest req) {
 		int limitPage = 9;

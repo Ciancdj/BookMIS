@@ -30,7 +30,7 @@ public class BooksController {
 	InFormsService informsService;
 	@Autowired
 	BorrowsService borrowsService;
-	
+
 	@RequestMapping(value="/books")
 	public ModelAndView GetBook(HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
@@ -42,7 +42,7 @@ public class BooksController {
 //			System.out.println(i.getBookcode());
 //		}
 		if(book.getBookintro().equals("")) {
-			book.setBookintro("������δ����鼮����");
+			book.setBookintro("本书暂未添加书籍介绍");
 		}
 		mav.addObject("Book", book);
 		mav.addObject("Booklist", Booklist);
@@ -50,7 +50,7 @@ public class BooksController {
 		mav.setViewName("Detail");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/returnBook")
 	public ModelAndView returnBook(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
@@ -62,7 +62,7 @@ public class BooksController {
 		mav.setViewName("redirect:/MyBorrow");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/borrowBook")
 	public ModelAndView borrowBook(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
@@ -74,7 +74,7 @@ public class BooksController {
 		Users user= (Users) session.getAttribute("holdingUsers");
 		if(user == null) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "��⵽δ��½�����ȵ�½");
+			mav.addObject("msg1", "检测到未登陆，请先登陆");
 			return mav;
 		}
 		int userID = user.getId();
@@ -109,7 +109,7 @@ public class BooksController {
 		mav.setViewName("SuccessBorrow");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/borrowAllBook")
 	public ModelAndView borrowAllBook(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
@@ -117,7 +117,7 @@ public class BooksController {
 		Users user= (Users) session.getAttribute("holdingUsers");
 		if(user == null) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "��⵽δ��½�����ȵ�½");
+			mav.addObject("msg1", "检测到未登陆，请先登陆");
 			return mav;
 		}
 		int userID = user.getId();
@@ -149,7 +149,7 @@ public class BooksController {
 		mav.setViewName("SuccessBorrow");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/MyBorrow")
 	public ModelAndView borrowList(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
@@ -157,7 +157,7 @@ public class BooksController {
 		Users user= (Users) session.getAttribute("holdingUsers");
 		if(user == null) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "��⵽δ��½�����ȵ�½");
+			mav.addObject("msg1", "检测到未登陆，请先登陆");
 			return mav;
 		}
 		List<Borrows> myborrrows = borrowsService.list(user.getId());
@@ -166,5 +166,5 @@ public class BooksController {
 		mav.setViewName("BorrowPage");
 		return mav;
 	}
-	
+
 }

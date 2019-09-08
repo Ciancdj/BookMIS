@@ -23,8 +23,8 @@ public class AdminController {
 	UsersService usersService;
 	@Autowired
 	BorrowsService borrowsService;
-	
-	
+
+
 	@RequestMapping(value="/adminlogin")
 	public ModelAndView adminLogin(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
@@ -32,18 +32,18 @@ public class AdminController {
 		Users users = (Users) session.getAttribute("holdingUsers");
 		if (users == null) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "¼ì²âµ½Î´µÇÂ½£¬ÇëÏÈµÇÂ½");
+			mav.addObject("msg1", "æ£€æµ‹åˆ°æœªç™»é™†ï¼Œè¯·å…ˆç™»é™†");
 			return mav;
 		}
 		if (users.getPower() > 2) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "¼ì²â·Ç¹ÜÀíÔ±ÕËºÅ£¬ÇëÇĞ»»ÕËºÅ");
+			mav.addObject("msg1", "æ£€æµ‹éç®¡ç†å‘˜è´¦å·ï¼Œè¯·åˆ‡æ¢è´¦å·");
 			return mav;
 		}
 		mav.setViewName("AdminLogin");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/adminloginTest")
 	public ModelAndView adminLoginTest(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
@@ -52,12 +52,12 @@ public class AdminController {
 		Users users = (Users) session.getAttribute("holdingUsers");
 		if (users == null) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "¼ì²âµ½Î´µÇÂ½£¬ÇëÏÈµÇÂ½");
+			mav.addObject("msg1", "æ£€æµ‹åˆ°æœªç™»é™†ï¼Œè¯·å…ˆç™»é™†");
 			return mav;
 		}
 		if (users.getPower() > 2) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "¼ì²â·Ç¹ÜÀíÔ±ÕËºÅ£¬ÇëÇĞ»»ÕËºÅ");
+			mav.addObject("msg1", "æ£€æµ‹éç®¡ç†å‘˜è´¦å·ï¼Œè¯·åˆ‡æ¢è´¦å·");
 			return mav;
 		}
 		String input = req.getParameter("input");
@@ -69,14 +69,14 @@ public class AdminController {
 				return mav;
 			}
 			session.setAttribute("loginErrorTime", loginErrorTime);
-			mav.addObject("Error", "ÃÜÔ¿ÊäÈë´íÎó´ÎÊı : " + loginErrorTime + "(ÈôÊÇ´íÎó´ÎÊı3´ÎÔòÇ¿ÖÆÕËºÅÏÂÏß)");
+			mav.addObject("Error", "å¯†é’¥è¾“å…¥é”™è¯¯æ¬¡æ•° : " + loginErrorTime + "(è‹¥æ˜¯é”™è¯¯æ¬¡æ•°3æ¬¡åˆ™å¼ºåˆ¶è´¦å·ä¸‹çº¿)");
 			mav.setViewName("AdminLogin");
 			return mav;
 		}
 		mav.setViewName("AdminIndex");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/adminBook")
 	public ModelAndView adminBook(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
@@ -84,12 +84,12 @@ public class AdminController {
 		Users users = (Users) session.getAttribute("holdingUsers");
 		if (users == null) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "¼ì²âµ½Î´µÇÂ½£¬ÇëÏÈµÇÂ½");
+			mav.addObject("msg1", "æ£€æµ‹åˆ°æœªç™»é™†ï¼Œè¯·å…ˆç™»é™†");
 			return mav;
 		}
 		if (users.getPower() > 2) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "¼ì²â·Ç¹ÜÀíÔ±ÕËºÅ£¬ÇëÇĞ»»ÕËºÅ");
+			mav.addObject("msg1", "æ£€æµ‹éç®¡ç†å‘˜è´¦å·ï¼Œè¯·åˆ‡æ¢è´¦å·");
 			return mav;
 		}
 		List<Borrows> allborrrows = borrowsService.Adminlist();
@@ -109,7 +109,7 @@ public class AdminController {
 		mav.setViewName("AdminBookPage");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/adminAccount")
 	public ModelAndView adminAccount(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
@@ -117,12 +117,12 @@ public class AdminController {
 		Users users = (Users) session.getAttribute("holdingUsers");
 		if (users == null) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "¼ì²âµ½Î´µÇÂ½£¬ÇëÏÈµÇÂ½");
+			mav.addObject("msg1", "æ£€æµ‹åˆ°æœªç™»é™†ï¼Œè¯·å…ˆç™»é™†");
 			return mav;
 		}
 		if (users.getPower() > 2) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "¼ì²â·Ç¹ÜÀíÔ±ÕËºÅ£¬ÇëÇĞ»»ÕËºÅ");
+			mav.addObject("msg1", "æ£€æµ‹éç®¡ç†å‘˜è´¦å·ï¼Œè¯·åˆ‡æ¢è´¦å·");
 			return mav;
 		}
 		List<Users> list = usersService.list();
@@ -130,5 +130,5 @@ public class AdminController {
 		mav.setViewName("AdminAccountPage");
 		return mav;
 	}
-	
+
 }

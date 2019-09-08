@@ -21,13 +21,13 @@ import model.service.ClassifyListsService;
 public class OtherController {
 	@Autowired
 	ClassifyListsService classifyLists;
-	
+
 	@RequestMapping(value="/search")
 	public ModelAndView GoSearch() {
 		ModelAndView mav = new ModelAndView("index");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/search/switch")
 	public ModelAndView switchSearch(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("redirect:/search");
@@ -35,7 +35,7 @@ public class OtherController {
 		mav.addObject("swit", s);
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/classify")
 	public ModelAndView getParent(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("Classify");
@@ -54,13 +54,13 @@ public class OtherController {
 		mav.addObject("sonList", sonList);
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/temporary")
 	public ModelAndView TemporaryPlace(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("Temporary");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/addTemporary")
 	public ModelAndView AddTemporary(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
@@ -76,7 +76,7 @@ public class OtherController {
 		Users users = (Users) session.getAttribute("holdingUsers");
 		if (users == null) {
 			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "¼ì²âµ½Î´µÇÂ½£¬ÇëÏÈµÇÂ½");
+			mav.addObject("msg1", "æ£€æµ‹åˆ°æœªç™»é™†ï¼Œè¯·å…ˆç™»é™†");
 			return mav;
 		}
 		List<TemporaryBook> TempList = (List<TemporaryBook>) session.getAttribute("TempList");
@@ -99,7 +99,7 @@ public class OtherController {
 	@RequestMapping(value="/deleteTemporary")
 	public ModelAndView DeleteTemporary(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("Temporary");
-		int deleteID = Integer.parseInt(req.getParameter("deleteID")); 
+		int deleteID = Integer.parseInt(req.getParameter("deleteID"));
 		HttpSession session = req.getSession();
 		session.setAttribute("TempNum", ((int) session.getAttribute("TempNum") - 1));
 		List<TemporaryBook> TempList = (List<TemporaryBook>) session.getAttribute("TempList");
@@ -107,7 +107,7 @@ public class OtherController {
 		session.setAttribute("TempList", TempList);
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/deleteTemporaryAll")
 	public ModelAndView DeleteTemporaryAll(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("Temporary");
@@ -117,11 +117,11 @@ public class OtherController {
 		session.setAttribute("TempList", TempList);
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/MyLibrary")
 	public ModelAndView myLibary(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("MyLibrary");
 		return mav;
 	}
-	
+
 }
