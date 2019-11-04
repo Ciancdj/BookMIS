@@ -30,14 +30,16 @@
      <!-- 扫描存放SQL语句的 xml 文件 -->
      <bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
      	<property name="typeAliasesPackage" value="model.pojo" />
+		 <!-- 数据源为DriverManagerDataSource(可用其他连接池)  -->
      	<property name="dataSource" ref="dataSource"/>
      	<property name="mapperLocations" value="classpath:model/mapper/*.xml"/>
      </bean>
 
-     <!-- 扫描Mapper，并将其生命周期纳入Spring的管理 -->
+     <!-- 扫描MapperDAO，需@MapperScanner标签,并将其生命周期纳入Spring的管理 -->
      <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
      	<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
      	<property name="basePackage" value="model.mapper"/>
      </bean>
+
 
 </beans>

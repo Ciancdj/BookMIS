@@ -1,5 +1,6 @@
 package Control.controller;
 
+import java.nio.charset.Charset;
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.List;
@@ -7,9 +8,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import model.service.impl.BorrowsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import model.pojo.Borrows;
@@ -129,6 +133,43 @@ public class AdminController {
 		mav.addObject("allUsers", list);
 		mav.setViewName("AdminAccountPage");
 		return mav;
+	}
+
+	@RequestMapping("/AdminBorrowPage")
+	public ModelAndView toAdminBorrowPage(HttpServletRequest req){
+		ModelAndView modelAndView = new ModelAndView();
+		HttpSession session = req.getSession();
+		String searchCode = (String)req.getParameter("searchBookCode");
+		String searchAccount = (String)req.getParameter("searchAccount");
+		List<Borrows> result = null;
+//		System.out.println("书本编号:" + searchCode);
+//		System.out.println("用户账号" + searchAccount);
+		//优先级 书本编号搜索 > 账号搜索
+		if(searchCode !=null && !searchCode.equals("")){
+			//TODO 书本ID搜索
+			result = borrowsService.AdminlistByBookCode(searchCode);
+		}else if(searchAccount != null && !searchAccount.equals("")){
+			//TODO 账号搜索
+			result = borrowsService.AdminlistByAccount(searchAccount);
+		}else{
+			//TODO 默认
+			result = borrowsService.Adminlist();
+		}
+		if(result != null){
+			Calendar now = Calendar.getInstance();
+			Calendar cal = Calendar.getInstance();
+			for (Borrows single : result){
+				single.setOverstate(false);
+				Date borrowTime = single.getBorrowerdate();
+				cal.setTime(borrowTime);
+				if(((now.getTimeInMillis() - cal.getTimeInMillis()) / (1000*60*60*24)) >= single.getFreeday()){
+					single.setOverstate(true);
+				}
+			}
+		}
+		modelAndView.addObject("AllBorrowList",result);
+		modelAndView.setViewName("AdminBorrowPage");
+		return modelAndView;
 	}
 
 }

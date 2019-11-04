@@ -1,15 +1,16 @@
 package model.pojo;
 import java.sql.Date;
 public class Borrows {
-	private String bookcode;
-	private String bookname;
-	private String bookauthor;
-	private String borrowername;
-	private String borrowerphone;
-	private int userid;
-	private Date borrowerdate;
-	private int freeday;
-	private boolean overstate;
+	private String bookcode;    //书本ID
+	private String bookname;	//书本名称
+	private String bookauthor; 	//书本作者
+	private String borrroweraccount; //借阅者账号
+	private String borrowername;//借阅者名字
+	private String borrowerphone;//借阅者电话
+	private int userid;			 //借阅者id
+	private Date borrowerdate;	 //借阅日期
+	private int freeday;		//免费时间
+	private boolean overstate;  //是否超时
 	public String getBookcode() {
 		return bookcode;
 	}
@@ -28,6 +29,8 @@ public class Borrows {
 	public void setBookauthor(String bookauthor) {
 		this.bookauthor = bookauthor;
 	}
+	public String getBorrroweraccount() {return borrroweraccount;}
+	public void setBorrroweraccount(String borrroweraccount) {this.borrroweraccount = borrroweraccount;}
 	public String getBorrowername() {
 		return borrowername;
 	}

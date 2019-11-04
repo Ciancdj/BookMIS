@@ -161,6 +161,7 @@ public class BooksController {
 			return mav;
 		}
 		List<Borrows> myborrrows = borrowsService.list(user.getId());
+		System.out.println(myborrrows.size());
 		mav.addObject("sizeBorrow", myborrrows.size());
 		mav.addObject("myborrow", myborrrows);
 		mav.setViewName("BorrowPage");

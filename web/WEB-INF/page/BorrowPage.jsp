@@ -11,6 +11,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Please input amount of money</title>
     <link rel="stylesheet" href="<%=basePath%>\\bootstrap-4.0.0-dist\\css\\bootstrap.min.css">
+	  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	  <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	  <script src="<%=basePath%>/bootstrap-4.0.0-dist/js/bootstrap.min.js" type="text/javascript"></script>
   </head>
   
   <body>
@@ -87,7 +90,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						<th>作者</th>
 						<th>可持有时间</th>
 						<th>逾期惩罚费率</th>
-						<th>操作</th>
+						<th>借阅日期</th>
+<%--						<th>操作</th>--%>
 					</tr></thead>
 					<tbody><c:forEach items="${myborrow}" var="inform" varStatus="status"><tr>
 								<td>${status.count}</td>
@@ -96,18 +100,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<td>${inform.bookauthor}</td>
 								<td>${holdingUsers.holday}</td>
 								<td>${holdingUsers.rate}</td>
-								<td><form action="returnBook" method=post>
-									<input type="hidden" name="bookcode" value="${inform.bookcode}"/>
-									<input type="hidden" name="userid" value="${holdingUsers.id}"/>
-									<button type="submit" class="btn btn-Success btn-lg">归还<span class="caret"></span></button>
-								</form></td>								
+								<td>${inform.borrowerdate}</td>
+<%--								<td><form action="returnBook" method=post>--%>
+<%--									<input type="hidden" name="bookcode" value="${inform.bookcode}"/>--%>
+<%--									<input type="hidden" name="userid" value="${holdingUsers.id}"/>--%>
+<%--									<button type="submit" class="btn btn-Success btn-lg">归还<span class="caret"></span></button>--%>
+<%--								</form></td>--%>
 					</tr></c:forEach></tbody>
 				</table>
   			</div>
   		</div>
   	</div>
-  	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-	<script src="<%=basePath%>\\bootstrap-4.0.0-dist\\js\\bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   </body>
 </html>

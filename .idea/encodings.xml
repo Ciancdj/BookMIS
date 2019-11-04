@@ -3,6 +3,8 @@
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/src/Control/controller/AdminController.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/Control/controller/OtherController.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/model/pojo/Books.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/model/pojo/InForms.java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

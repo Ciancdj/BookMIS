@@ -24,5 +24,11 @@ public class BorrowsServiceImpl implements BorrowsService {
 	public List<Borrows> Adminlist(){
 		return borrowsMapper.adminList();
 	}
-	
+
+	public List<Borrows> AdminlistByAccount(String userAccount){
+		return borrowsMapper.adminListByAccount(userAccount);
+	}
+	public List<Borrows> AdminlistByBookCode(String bookCode){
+		return borrowsMapper.adminListByBookCode(bookCode);
+	}
 }

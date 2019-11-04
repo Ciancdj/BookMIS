@@ -6,28 +6,44 @@
     	<!-- 中介映射转换 -->
     	<resultMap type="Borrows" id="BorrowsRM">
     		<!-- 主键映射 -->
-    		<id property="id" column="userID" />
+<!--    		<id property="id" column="userID" />-->
  			<!-- 普通字段映射 -->
- 			<result property="bookcode" column="bookCode" />
- 			<result property="bookname" column="bookName" />
- 			<result property="bookauthor" column="bookAuthor" />
- 			<result property="borrowername" column="borrowerName" />
- 			<result property="borrowerphone" column="borrowerPhone" />
- 			<result property="borrowerdate" column="borrowTime" />
- 			<result property="freeday" column="freeDay" />
+ 			<result property="bookcode" column="bookCode" />             <!-- 书本ID -->
+ 			<result property="bookname" column="bookName" />			 <!-- 书本名称 -->
+ 			<result property="bookauthor" column="bookAuthor" />		 <!-- 书本作者 -->
+			<result property="borrroweraccount" column="userAccount"/>	 <!-- 借阅者账号 -->
+			<result property="userid" column="userId"/>			 		 <!--  借阅者ID-->
+ 			<result property="borrowername" column="borrowerName" />	 <!-- 借阅者名称 -->
+ 			<result property="borrowerphone" column="borrowerPhone" />	 <!-- 借阅者电话 -->
+ 			<result property="borrowerdate" column="borrowTime" />		 <!-- 借阅时间 -->
+ 			<result property="freeday" column="freeDay" />				 <!-- 免费时间 -->
  			<!-- power属性两边字段一致不添加 -->
     	</resultMap>    
         
         <select id="get" parameterType="java.lang.Integer" resultMap="BorrowsRM" >
-    			select bookCode, bookName, bookAuthor from book_next, book where book_next.bookID = book.bookID 
-			and bookCode in (select bookID from borrow where userID = #{userid});
+    			select b.bookCode,bookName,bookAuthor,b.borrowTime from book, (select userID,book_next.bookID,bookCode,borrowTime from
+    			(select userID,bookID,borrowTime from borrow where userID=#{userid}) as borrowList inner join book_next on
+    			borrowList.bookID = book_next.bookCode) as b where b.bookID=book.bookId;
     	</select>
         
         <select id="adminList" parameterType="java.lang.Integer" resultMap="BorrowsRM" >
-    			select bookCode, bookName, bookAuthor,borrowerName,borrowerPhone,borrowTime, freeDay
+    			select bookCode, bookName, bookAuthor,userAccount, users.userId as userId,borrowerName,borrowerPhone,borrowTime, freeDay
 			from borrow, book_next, book, users, users_information,fine where book_next.bookID = book.bookID 
 			and book_next.bookCode = borrow.bookID and users.userID = users_information.userID
 			and fine.power = users.power and borrow.userID = users.userID;
     	</select>
-        
+
+		<select id="adminListByAccount" parameterType="String" resultMap="BorrowsRM">
+			    select bookCode, bookName, bookAuthor,userAccount, users.userId as userId,borrowerName,borrowerPhone,borrowTime, freeDay
+			from borrow, book_next, book, users, users_information,fine where book_next.bookID = book.bookID
+			and book_next.bookCode = borrow.bookID and users.userID = users_information.userID
+			and fine.power = users.power and borrow.userID = users.userID and userAccount = #{userAccount};
+		</select>
+
+		<select id="adminListByBookCode" parameterType="String" resultMap="BorrowsRM">
+			    select bookCode, bookName, bookAuthor,userAccount, users.userId as userId,borrowerName,borrowerPhone,borrowTime, freeDay
+			from borrow, book_next, book, users, users_information,fine where book_next.bookID = book.bookID
+			and book_next.bookCode = borrow.bookID and users.userID = users_information.userID
+			and fine.power = users.power and borrow.userID = users.userID and bookCode = #{bookCode};
+		</select>
     </mapper>

@@ -11,9 +11,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Please input amount of money</title>
     <link rel="stylesheet" href="<%=basePath%>\\bootstrap-4.0.0-dist\\css\\bootstrap.min.css">
+	  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	  <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	  <script src="<%=basePath%>/bootstrap-4.0.0-dist/js/bootstrap.min.js" type="text/javascript"></script>
   </head>
   
-  <body style="overflow-x:hidden; overflow-y:hidden" class="bg-light">
+<%--  <body style="overflow-x:hidden; overflow-y:hidden" class="bg-light">--%>
+  <body class="bg-light">
   	<nav class="navbar navbar-expand-md navbar-dark bg-dark .navbar-static-top" style="height:50px">
   		<div class="collapse navbar-collapse" id="navbarCollapse">
   			<ul class="navbar-nav mr-auto">
@@ -66,7 +70,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   		</div>
   	</nav>
   	<div>
-  		
       <section class="jumbotron text-center" style="background:white">
         <div class="container">
           <h1 class="jumbotron-heading">管理员首页</h1>
@@ -104,27 +107,29 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                 </div>
               </div>
             </div>
-            <!-- 
-            <div class="col-md-4">
-              <div class="card mb-4 box-shadow">
-                <div class="card-body">
-                  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-             -->
-      		</div>
-      	</div>
+			</div>
+      	</div><br>
+		  <!-- 借阅入口 -->
+		  <div class="container">
+			  <div class="row">
+				  <div class="col-md-6">
+					  <div class="card mb-6 box-shadow">
+						  <div class="card-body">
+							  <p class="card-text">借阅管理界面，该界面可以对已有的图书进行借阅和归还操作</p>
+							  <div class="d-flex justify-content-between align-items-center">
+								  <div class="btn-group">
+									  <!-- 跳转入口 -->
+									  <form action="AdminBorrowPage" method=post>
+										  <button type="submit" class="btn btn-sm btn-outline-secondary">点击此处跳转</button>
+									  </form>
+								  </div>
+							  </div>
+						  </div>
+					  </div>
+				  </div>
+			  </div>
+		  </div>
       </div>
   	</div>
-  	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-	<script src="<%=basePath%>\\bootstrap-4.0.0-dist\\js\\bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   </body>
 </html>
