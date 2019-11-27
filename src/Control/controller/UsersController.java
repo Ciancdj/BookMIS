@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import model.encryption.Decode;
+import model.encryption.EncryKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,8 @@ public class UsersController {
 	@RequestMapping(value="/login")
 	public ModelAndView LoginView() {
 		ModelAndView mav = new ModelAndView();
+		mav.addObject("exponent", EncryKey.getKu().getE().toString());
+		mav.addObject("modulus", EncryKey.getKu().getN().toString());
 		mav.setViewName("Login");
 		return mav;
 	}
@@ -48,7 +52,7 @@ public class UsersController {
 		mav.addObject("msg2", "");
 		String account = input.getAccount();
 		String password = input.getPassword();
-		// System.out.println(account + "  " + password);
+		System.out.println(account + "  " + Decode.decode(password));
 		Users user = usersService.get(account);
 		if(user == null) {		// 没有通过姓名找到对应项
 			mav.addObject("msg1", "该账号不存在，清先注册");
@@ -56,7 +60,7 @@ public class UsersController {
 		if(user != null && password == null) {
 			mav.addObject("msg2", "密码不能为空");
 		}
-		password = MD5(password);
+		password = MD5(Decode.decode(password));
 		if(user != null && !user.getPassword().equals(password)) {
 			mav.addObject("msg2", "密码错误，请重新输出");
 		}
@@ -77,8 +81,12 @@ public class UsersController {
 	}
 
 	@RequestMapping(value="/register")
-	public String RegisterView() {
-		return "Register";
+	public ModelAndView RegisterView() {
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("exponent", EncryKey.getKu().getE().toString());
+		mav.addObject("modulus", EncryKey.getKu().getN().toString());
+		mav.setViewName("Register");
+		return mav;
 	}
 
 	@RequestMapping(value="/login/outlogin")
@@ -130,7 +138,10 @@ public class UsersController {
 			return mav;
 		}
 		input.setPower(3);
-		input.setPassword(MD5(input.getPassword()));
+		System.out.println(input.getPassword());
+		System.out.println(input.getAccount() + "  " + Decode.decode(input.getPassword()));
+		// 设置密码
+		input.setPassword(MD5(Decode.decode(input.getPassword())));
 		usersService.add(input);
 		HttpSession session = request.getSession(true);
 		session.setAttribute("holdingUsers", input);
@@ -200,6 +211,8 @@ public class UsersController {
 	@RequestMapping(value="/changePassword")
 	public ModelAndView ChangePassword(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("PasswordInstall");
+		mav.addObject("exponent", EncryKey.getKu().getE().toString());
+		mav.addObject("modulus", EncryKey.getKu().getN().toString());
 		return mav;
 	}
 
@@ -207,7 +220,7 @@ public class UsersController {
 	public ModelAndView ChangePasswordInput(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("ReturnPage");
 		String nowPassword = req.getParameter("nowPassword");
-		nowPassword = MD5(nowPassword);
+		nowPassword = MD5(Decode.decode(nowPassword));
 		int id = Integer.parseInt(req.getParameter("id"));
 		if (!usersService.checkPassword(id, nowPassword)) {
 			mav.addObject("returnInformation", "密码错误，将返回密码修改界面");
@@ -215,11 +228,12 @@ public class UsersController {
 			return mav;
 		}
 		String changePassword = req.getParameter("changePassword");
-		changePassword = MD5(changePassword);
+		changePassword = MD5(Decode.decode(changePassword));
 		Users user = new Users();
 		user.setId(id);
 		user.setPassword(changePassword);
 		usersService.updataPassword(user);
+		System.out.println(nowPassword + " " + changePassword);
 		mav.addObject("returnInformation", "密码修改成功，将退出登陆并返回首页");
 		mav.addObject("returnUrl", "../login/outlogin");
 		return mav;

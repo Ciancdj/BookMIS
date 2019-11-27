@@ -13,6 +13,27 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 	  <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 	  <script src="<%=basePath%>/bootstrap-4.0.0-dist/js/bootstrap.min.js" type="text/javascript"></script>
+	  <script src="<%=basePath%>/bootstrap-4.0.0-dist/js/bignumber.js"></script>
+	  <script>
+		  function Encrypt(){
+			  var password = $("#password").val();
+			  var len = password.length;
+			  var output="";
+			  while(--len>=0){
+				  var ascall = password.charCodeAt(len);
+				  var tempE = new BigNumber(ascall).exponentiatedBy("${exponent}").valueOf();
+				  var tempN = new BigNumber(tempE).modulo("${modulus}").valueOf();
+				  var hex = new BigNumber(tempN).toString(16);
+				  var length = hex.length;
+				  while(length++<16){
+					  hex="0"+hex;
+				  }
+				  output+=hex;
+			  }
+			  $("#password").val(output.toString());
+			  return true;
+		  }
+	  </script>
   </head>
   
   <body>
@@ -23,7 +44,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     		<h2>注册界面</h2>
     		<p class="lead">请在下面的选项中输入您的信息</p>
     	</div>
-    	<form action="register/Testing" method=post class="needs-validation" novalidate>
+    	<form action="register/Testing" method=post class="needs-validation" novalidate onsubmit="return Encrypt();">
     	<div class="order-md-1">
     		<h4 class="mb-3">基本信息填写</h4>
     			<div class="row">
@@ -46,7 +67,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
         </div>
         <div class="mb-3">
     		<label for="password">密码</label>
-            <input type="text" class="form-control" name="password" id="password" placeholder="Password" required>
+            <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
             <div class="invalid-feedback" style="width: 100%;">
               	Your password is required.
             </div>

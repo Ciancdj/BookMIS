@@ -14,6 +14,27 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
       <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
       <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
       <script src="<%=basePath%>/bootstrap-4.0.0-dist/js/bootstrap.min.js" type="text/javascript"></script>
+	  <script src="<%=basePath%>/bootstrap-4.0.0-dist/js/bignumber.js"></script>
+	  <script>
+		  function Encrypt(){
+              var password = $("#inputPassword").val();
+			  var len = password.length;
+			  var output="";
+			  while(--len>=0){
+			  	  var ascall = password.charCodeAt(len);
+				  var tempE = new BigNumber(ascall).exponentiatedBy("${exponent}").valueOf();
+				  var tempN = new BigNumber(tempE).modulo("${modulus}").valueOf();
+				  var hex = new BigNumber(tempN).toString(16);
+				  var length = hex.length;
+				  while(length++<16){
+				  	hex="0"+hex;
+				  }
+				  output+=hex;
+			  }
+			  $("#inputPassword").val(output.toString());
+			  return true;
+		  }
+	  </script>
   </head>
   
   <body style="overflow-x:hidden; overflow-y:hidden" >
@@ -37,9 +58,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
           	</form>
   		</div>
   	</nav><br/><br/>
-  	<img src="<%=basePath%>\\img\\book.jpg" class="d-block mx-auto mb-4" style="height:150px;width:150px" >
+  	<img src="<%=basePath%>\\img\\book.jpg" class="d-block mx-auto mb-4" style="height:150px;width:150px">
   	<div class="text-center  mx-auto" style="max-width: 330px">
-  		<form class="form-signin" action="login/Testing" method=post>
+  		<form class="form-signin" action="login/Testing" method=post  onsubmit="return Encrypt();">
   			<h1 class="h3 mb-3 font-weight-normal">Sign in</h1>
   			<label class="sr-only" for="inputAccount">Account</label>
   			<input type="text" name="account" id="inputAccount" class="form-control" placeholder="Account" required autofocus>

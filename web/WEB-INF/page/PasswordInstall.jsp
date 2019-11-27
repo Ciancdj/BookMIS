@@ -14,6 +14,42 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 	  <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 	  <script src="<%=basePath%>/bootstrap-4.0.0-dist/js/bootstrap.min.js" type="text/javascript"></script>
+	  <script src="<%=basePath%>/bootstrap-4.0.0-dist/js/bignumber.js"></script>
+	  <script>
+		  function Encrypt(){
+			  var password = $("#nowPassword").val();
+			  var len = password.length;
+			  var output1="";
+			  while(--len>=0){
+				  var ascall = password.charCodeAt(len);
+				  var tempE = new BigNumber(ascall).exponentiatedBy("${exponent}").valueOf();
+				  var tempN = new BigNumber(tempE).modulo("${modulus}").valueOf();
+				  var hex = new BigNumber(tempN).toString(16);
+				  var length = hex.length;
+				  while(length++<16){
+					  hex="0"+hex;
+				  }
+				  output1+=hex;
+			  }
+			  password = $("#changePassword").val();
+			  len = password.length;
+			  var output2="";
+			  while(--len>=0){
+				  ascall = password.charCodeAt(len);
+				  tempE = new BigNumber(ascall).exponentiatedBy("${exponent}").valueOf();
+				  tempN = new BigNumber(tempE).modulo("${modulus}").valueOf();
+				  hex = new BigNumber(tempN).toString(16);
+				  length = hex.length;
+				  while(length++<16){
+					  hex="0"+hex;
+				  }
+				  output2+=hex;
+			  }
+			  $("#nowPassword").val(output1.toString());
+			  $("#changePassword").val(output2.toString());
+			  return true;
+		  }
+	  </script>
   </head>
   
   <body class="bg-light">
@@ -80,7 +116,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   		</nav>
   		<div class="col-md-9" >
   			<br/><br/><br/><br/><br/>
-  			<form action="changePassword/input" method=post>
+  			<form action="changePassword/input" method=post onsubmit="return Encrypt();">
   				<div class="table-responsive">
 					<table class="table">
 						<thead>
@@ -91,11 +127,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						<tbody>
 							<tr>
 								<td>请输入当前的密码：</td>
-								<td><input type="text" name="nowPassword" class="form-control" required></td>
+								<td><input type="password" id="nowPassword" name="nowPassword" class="form-control" required></td>
 							</tr>
 							<tr>
 								<td>请输入更新后的密码：</td>
-								<td><input type="text" name="changePassword" class="form-control" required></td>
+								<td><input type="password" id="changePassword" name="changePassword" class="form-control" required></td>
 							</tr>
 						</tbody>
 					</table>
