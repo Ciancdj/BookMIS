@@ -91,7 +91,7 @@ public class UsersController {
 			if(tempSessionId!=null){
 				// 判断已登录得账户是否超时
 				if(System.currentTimeMillis() -
-						UsersMapHolding.SESSIONID_USR.get(tempSessionId).getLastActivityTime() < (5*60*1000)){
+						UsersMapHolding.SESSIONID_USR.get(tempSessionId).getLastActivityTime() < (2*60*1000)){
 					mav.addObject("msg2", "账户已经被登陆");
 					return mav;
 				}
@@ -326,7 +326,7 @@ public class UsersController {
 		if (users == null) {
 			throw new ErrorInformationException("检测到未登陆，请先登陆");
 		}
-		if(System.currentTimeMillis() - users.getLastActivityTime() >= (5*60*1000)){
+		if(System.currentTimeMillis() - users.getLastActivityTime() >= (2*60*1000)){
 			throw new ErrorInformationException("长时间未响应，请重新登陆");
 		}
 		Users tempUser = usersService.get(users.getAccount());

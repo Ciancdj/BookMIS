@@ -225,7 +225,7 @@ public class BooksController {
 		if (users == null) {
 			throw new ErrorInformationException("检测到未登陆，请先登陆");
 		}
-		if(System.currentTimeMillis() - users.getLastActivityTime() >= (5*60*1000)){
+		if(System.currentTimeMillis() - users.getLastActivityTime() >= (2*60*1000)){
 			throw new ErrorInformationException("长时间未响应，请重新登陆");
 		}
 		Users tempUser = usersService.get(users.getAccount());
