@@ -72,8 +72,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   	<div class="row">
   		<nav class="col-md-3 d-none d-md-block bg-light sidebar">
   			<div class="list-group"  id="accordion">
-  				<a href="adminBook" class="list-group-item list-group-item-success">书籍管理界面</a>
-  				<a href="adminAccount" class="list-group-item list-group-item-info ">用户管理系统</a>
+				<a href="adminBook" class="list-group-item list-group-item-success">书籍管理界面</a>
+				<a href="adminAccount" class="list-group-item list-group-item-info ">用户管理系统</a>
+				<a href="AdminBorrowPage" class="list-group-item list-group-item-danger">借阅管理系统</a>
   			</div>
   		</nav>
   		<div class="col-md-9">

@@ -1,5 +1,7 @@
 package model.pojo;
 
+import java.util.Date;
+
 public class Users {
 	private int id;
 	private String account;
@@ -8,7 +10,18 @@ public class Users {
 	private String usersname;
 	private String usersphone;
 	private int holday;
+	private int state;
 	private double rate;
+	private long lastActivityTime;
+	public long getLastActivityTime() {
+		return lastActivityTime;
+	}
+	public void setLastActivityTime(long lastActivityTime) {
+		this.lastActivityTime = lastActivityTime;
+	}
+	public void updateLastActivityTime(){
+		setLastActivityTime(System.currentTimeMillis());
+	}
 	public int getId() {
 		return id;
 	}
@@ -45,6 +58,8 @@ public class Users {
 	public void setUsersphone(String usersphone) {
 		this.usersphone = usersphone;
 	}
+	public void setState(int state) { this.state = state; }
+	public int getState() { return state; }
 	public int getHolday() {
 		return holday;
 	}

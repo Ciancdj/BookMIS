@@ -74,7 +74,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   			<div class="list-group"  id="accordion">
   				<a href="adminBook" class="list-group-item list-group-item-success">书籍管理界面</a>
   				<a href="adminAccount" class="list-group-item list-group-item-info ">用户管理系统</a>
-				<a href="AdminBorrow" class="list-group-item list-group-item-danger">借阅管理系统</a>
+				<a href="AdminBorrowPage" class="list-group-item list-group-item-danger">借阅管理系统</a>
   			</div>
   		</nav>
   		<div class="col-md-9">
@@ -89,6 +89,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						<th>用户权限等级</th>
 						<th>用户最长借阅时间</th>
 						<th>用户预期费率</th>
+						<th>状态设置</th>
+						<th>特殊操作</th>
 					</tr></thead>
 					<tbody><c:forEach items="${allUsers}" var="users" varStatus="status">
 						<c:if test="${inform.power == 1}">
@@ -99,7 +101,28 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<td>${users.usersphone}</td>
 								<td>${users.power}</td>
 								<td>${users.holday}</td>
-								<td>${users.rate}</td>				
+								<td>${users.rate}</td>
+								<td>
+									<form class="form-signin" action="AdminAccounttState" method=post>
+										<input type="hidden" name="operaId" value="${users.id}">
+										<c:if test="${users.state == '1'}">
+											<input type="hidden" name="operaValue" value="0">
+											<button type="button" class="btn btn-success disabled">正常</button>
+											<button type="submit" class="btn btn-default">冻结</button>
+										</c:if>
+										<c:if test="${users.state == '0'}">
+											<input type="hidden" name="operaValue" value="1">
+											<button type="submit" class="btn btn-default">正常</button>
+											<button type="button" class="btn btn-success disabled">冻结</button>
+										</c:if>
+									</form>
+								</td>
+								<td>
+									<form class="form-signin" action="AdminAccountState" method=post>
+										<input type="hidden" name="operaId" value="${users.id}">
+										<button type="button" class="btn btn-danger">注销</button>
+									</form>
+								</td>
 							</tr>
 						</c:if>
 						<c:if test="${inform.overstate != true}">
@@ -110,7 +133,28 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<td>${users.usersphone}</td>
 								<td>${users.power}</td>
 								<td>${users.holday}</td> 
-								<td>${users.rate}</td>				
+								<td>${users.rate}</td>
+								<td>
+									<form class="form-signin" action="AdminAccountState" method=post>
+										<input type="hidden" name="operaId" value="${users.id}">
+										<c:if test="${users.state == '1'}">
+											<input type="hidden" name="operaValue" value="0">
+											<button type="submit" class="btn btn-success disabled">正常</button>
+											<button type="submit" class="btn btn-default">冻结</button>
+										</c:if>
+										<c:if test="${users.state == '0'}">
+											<input type="hidden" name="operaValue" value="1">
+											<button type="submit" class="btn btn-default">正常</button>
+											<button type="submit" class="btn btn-success disabled">冻结</button>
+										</c:if>
+									</form>
+								</td>
+								<td>
+									<form class="form-signin" action="AdminAccountDelete" method=post>
+										<input type="hidden" name="operaId" value="${users.id}">
+										<button type="submit" class="btn btn-danger">注销</button>
+									</form>
+								</td>
 							</tr>
 						</c:if>		
 					</c:forEach></tbody>

@@ -37,7 +37,6 @@ public class UsersServiceImpl implements UsersService{
 	@Override
 	public void delete(int id) {
 		usersMapper.delete(id);
-		usersMapper.deleteinfor(id);
 	}
 	
 	@Override
@@ -49,7 +48,12 @@ public class UsersServiceImpl implements UsersService{
 	public void updataPassword(Users user) {
 		usersMapper.updatePassword(user);
 	}
-	
+
+	@Override
+	public void updateState(int id, int state) {
+		usersMapper.updateState(id, state);
+	}
+
 	@Override
 	public boolean checkPassword(int id, String input) {
 		return usersMapper.checkPassword(id).equals(input);

@@ -10,5 +10,6 @@ public interface UsersService {
 	void delete(int id);
 	void updataInform(Users user);
 	void updataPassword(Users user);
+	void updateState(int id, int state);
 	boolean checkPassword(int id, String input);
 }

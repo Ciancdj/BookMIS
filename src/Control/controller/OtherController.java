@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import model.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,8 @@ import model.service.ClassifyListsService;
 
 @Controller
 public class OtherController {
+	@Autowired
+	UsersService usersService;
 	@Autowired
 	ClassifyListsService classifyLists;
 
@@ -58,6 +61,12 @@ public class OtherController {
 	@RequestMapping(value="/temporary")
 	public ModelAndView TemporaryPlace(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("Temporary");
+		try{
+			judgeAccountNormal(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
+		}
 		return mav;
 	}
 
@@ -73,11 +82,11 @@ public class OtherController {
 		String bookid = req.getParameter("bookid");
 		TemporaryBook temp = new TemporaryBook(bookcode, bookname, bookauthor, bookindex, bookpress, bookid);
 		HttpSession session = req.getSession();
-		Users users = (Users) session.getAttribute("holdingUsers");
-		if (users == null) {
-			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "检测到未登陆，请先登陆");
-			return mav;
+		try{
+			judgeAccountNormal(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
 		}
 		List<TemporaryBook> TempList = (List<TemporaryBook>) session.getAttribute("TempList");
 		int num = (int) session.getAttribute("TempNum");
@@ -99,6 +108,12 @@ public class OtherController {
 	@RequestMapping(value="/deleteTemporary")
 	public ModelAndView DeleteTemporary(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("Temporary");
+		try{
+			judgeAccountNormal(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
+		}
 		int deleteID = Integer.parseInt(req.getParameter("deleteID"));
 		HttpSession session = req.getSession();
 		session.setAttribute("TempNum", ((int) session.getAttribute("TempNum") - 1));
@@ -111,6 +126,12 @@ public class OtherController {
 	@RequestMapping(value="/deleteTemporaryAll")
 	public ModelAndView DeleteTemporaryAll(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("Temporary");
+		try{
+			judgeAccountNormal(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
+		}
 		HttpSession session = req.getSession();
 		session.setAttribute("TempNum", 0);
 		List<TemporaryBook> TempList = new ArrayList<TemporaryBook>();
@@ -121,7 +142,62 @@ public class OtherController {
 	@RequestMapping(value="/MyLibrary")
 	public ModelAndView myLibary(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("MyLibrary");
+		try{
+			judgeAccountNormal(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
+		}
 		return mav;
 	}
 
+
+	/*
+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	 */
+	public boolean judgePowerOfAdmin(HttpServletRequest req) throws ErrorInformationException{
+		if(!judgeAccountNormal(req)){
+			return false;
+		}
+		HttpSession session = req.getSession();
+		Users users = (Users) session.getAttribute("holdingUsers");
+		if (users.getPower() > 2) {
+			throw new ErrorInformationException("检测非管理员账号，请切换账号");
+		}
+		return true;
+	}
+	public boolean judgeAccountNormal(HttpServletRequest req) throws ErrorInformationException{
+		HttpSession session = req.getSession();
+		String sessionID = session.getId();
+		Users users = (Users) session.getAttribute("holdingUsers");
+		if (users == null) {
+			throw new ErrorInformationException("检测到未登陆，请先登陆");
+		}
+		if(System.currentTimeMillis() - users.getLastActivityTime() >= (5*60*1000)){
+			throw new ErrorInformationException("长时间未响应，请重新登陆");
+		}
+		Users tempUser = usersService.get(users.getAccount());
+		if(tempUser == null){
+			throw new ErrorInformationException("该账户已经被注销，请重新注册");
+		} else if(tempUser.getState() == 0){
+			throw new ErrorInformationException("该账户已经被冻结，请联系管理员");
+		}
+		users.updateLastActivityTime();
+		session.setAttribute("holdingUsers",users);
+		return true;
+	}
+	public ModelAndView errorOutLogin(ModelAndView mav, HttpServletRequest req){
+		mav.setViewName("redirect:/login");
+		accountDis(req);
+		return mav;
+	}
+	public void accountDis(HttpServletRequest req){
+		HttpSession session = req.getSession();
+		Users users = (Users)session.getAttribute("holdingUsers");
+		if(session.getId().equals(UsersMapHolding.USR_SESSION.get(users.getAccount()))){
+			UsersMapHolding.USR_SESSION.remove(users.getAccount());
+			UsersMapHolding.SESSIONID_USR.remove(session.getId());
+		}
+		session.setAttribute("holdingUsers", null);
+	}
 }

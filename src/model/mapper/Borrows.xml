@@ -21,9 +21,10 @@
     	</resultMap>    
         
         <select id="get" parameterType="java.lang.Integer" resultMap="BorrowsRM" >
-    			select b.bookCode,bookName,bookAuthor,b.borrowTime from book, (select userID,book_next.bookID,bookCode,borrowTime from
-    			(select userID,bookID,borrowTime from borrow where userID=#{userid}) as borrowList inner join book_next on
-    			borrowList.bookID = book_next.bookCode) as b where b.bookID=book.bookId;
+    			select bookCode, bookName, bookAuthor,userAccount, users.userId as userId,borrowerName,borrowerPhone,borrowTime, freeDay
+			from borrow, book_next, book, users, users_information,fine where book_next.bookID = book.bookID
+			and book_next.bookCode = borrow.bookID and users.userID = users_information.userID
+			and fine.power = users.power and borrow.userID = #{userid} and users.userID = #{userid};
     	</select>
         
         <select id="adminList" parameterType="java.lang.Integer" resultMap="BorrowsRM" >

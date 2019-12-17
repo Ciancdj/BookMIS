@@ -75,7 +75,7 @@
                 <div class="list-group"  id="accordion">
                     <a href="adminBook" class="list-group-item list-group-item-success">书籍管理界面</a>
                     <a href="adminAccount" class="list-group-item list-group-item-info ">用户管理系统</a>
-                    <a href="AdminBorrow" class="list-group-item list-group-item-danger">借阅管理系统</a>
+                    <a href="AdminBorrowPage" class="list-group-item list-group-item-danger">借阅管理系统</a>
                 </div>
             </nav>
 

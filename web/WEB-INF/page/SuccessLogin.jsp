@@ -15,9 +15,18 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 	  <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 	  <script src="<%=basePath%>/bootstrap-4.0.0-dist/js/bootstrap.min.js" type="text/javascript"></script>
+	  <script type="text/javascript">
+		  function load()
+		  {
+			  var informationTips="${overTimeBookInformation}";
+			  if(informationTips != "" && informationTips != null){
+				  window.alert(informationTips);
+			  }
+		  }
+	  </script>
   </head>
   
-  <body style="overflow-x:hidden; overflow-y:hidden" >
+  <body style="overflow-x:hidden; overflow-y:hidden" onload="load()">
     <nav class="navbar navbar-expand-md navbar-dark bg-dark .navbar-static-top" style="height:50px">
   		<div class="collapse navbar-collapse" id="navbarCollapse">
   			<ul class="navbar-nav mr-auto">
@@ -36,11 +45,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   		</div>
   	</nav><br/><br/>
   	<main role="main" class="container">
-      <div class="jumbotron">
-        <h1>系统提醒：</h1>
-        <p class="lead">${holdingUsers.account}账户登陆成功</p>
-        <a class="btn btn-lg btn-primary" href="../search" role="button">请点击该处进行跳转 &raquo;</a>
-      </div>
+        <div class="jumbotron">
+            <h1>系统提醒：</h1>
+            <p class="lead">${holdingUsers.account}账户登陆成功</p>
+            <a class="btn btn-lg btn-primary" href="../search" role="button">请点击该处进行跳转 &raquo;</a>
+        </div>
+        <meta http-equiv="refresh" content="5;URL=../search">
     </main>
   </body>
 </html>

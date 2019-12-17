@@ -30,15 +30,13 @@
     	</insert>
     	
     	<delete id="delete" parameterType="java.lang.Integer">
-    		delete from users where id = #{id}
+    		delete users,users_information from users join users_information
+    		where users.userID = #{id} and users_information.userID = #{id};
     	</delete>
-    	
-    	<delete id="deleteinfor" parameterType="java.lang.Integer">
-    		delete from users_information where id = #{id}
-    	</delete>
+
     	
     	<select id="get" parameterType="String" resultMap="UsersRM" >
-    			select users.userID,userAccount,userPassword, borrowerName, borrowerPhone, freeDay,fineRate, users.power
+    		select users.userID,userAccount,userPassword, borrowerName, borrowerPhone, freeDay,fineRate, users.power, users.state
 			from users, fine, users_information where users.userID = users_information.userID and 
 			userAccount = #{account} and fine.power = (SELECT power FROM users where userAccount = #{account});
     	</select>
@@ -48,7 +46,7 @@
         </select>
     	
     	<select id="list" resultMap="UsersRM">
-           	select users.userID, userAccount, users.power, borrowerName, borrowerPhone, freeDay, fineRate
+           	select users.userID, userAccount, users.power, borrowerName, borrowerPhone, freeDay, fineRate, users.state
 			FROM users, users_information, fine where users.userID = users_information.userID 
 			and users.power = fine.power;
         </select>
@@ -60,5 +58,9 @@
         <update id="updatePassword" parameterType="Users" >
             update users set userPassword=#{password} where userID=#{id}   
         </update>
-        
+
+		<update id="updateState">
+			update users set state=#{state} where userID=#{id}
+		</update>
+
     </mapper>

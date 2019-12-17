@@ -8,64 +8,52 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.math.BigInteger;
+import java.util.Random;
 
 public class EncryKey {
     private static KR kr;
     private static KU ku;
 
-    private static void setKr() {
-        try{
-            String path = PathReader.class.getClassLoader().getResource("KR.tem").getPath();
-            ObjectInputStream oi = new ObjectInputStream(
-                    new FileInputStream(path)
-            );
-            kr = (KR)oi.readObject();
-            oi.close();
-        } catch (FileNotFoundException e){
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
-        } catch (ClassNotFoundException e){
-            e.printStackTrace();
+    private static int prime(BigInteger a, BigInteger b){
+        BigInteger c;
+        while(!(c = a.mod(b)).toString().equals("0")){
+            a = b;
+            b = c;
         }
+        return b.intValue();
     }
 
-    private static void setKu() {
-        try{
-            String path = PathReader.class.getClassLoader().getResource("KU.tem").getPath();
-            ObjectInputStream oi = new ObjectInputStream(
-                    new FileInputStream(path)
-            );
-            ku = (KU)oi.readObject();
-            oi.close();
-        } catch (FileNotFoundException e){
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
-        } catch (ClassNotFoundException e){
-            e.printStackTrace();
+    private static void createKey(){
+        BigInteger p = BigInteger.probablePrime(500, new Random());  // p
+        BigInteger q = BigInteger.probablePrime(500, new Random());  // q
+        BigInteger n = p.multiply(q);
+        BigInteger temp = (p.subtract(new BigInteger("1"))).multiply(q.subtract(new BigInteger("1")));
+        BigInteger e = new BigInteger("2");
+        while(prime(temp,e) != 1){
+            e = e.add(new BigInteger("1"));
         }
+        BigInteger d = e.modPow(new BigInteger("-1"),temp);
+        kr = new KR(d,n);
+        ku = new KU(e,n);
     }
 
     private EncryKey(){
-        if(kr == null){
-            setKr();
-        }
-        if(ku == null){
-            setKu();
+        if(kr == null || ku == null){
+            createKey();
         }
     }
 
     public static KR getKr() {
         if(kr == null){
-            setKr();
+            createKey();
         }
         return kr;
     }
 
     public static KU getKu() {
         if(ku == null){
-            setKu();
+            createKey();
         }
         return ku;
     }

@@ -27,22 +27,14 @@ public class AdminController {
 	UsersService usersService;
 	@Autowired
 	BorrowsService borrowsService;
-
-
 	@RequestMapping(value="/adminlogin")
 	public ModelAndView adminLogin(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
-		HttpSession session = req.getSession();
-		Users users = (Users) session.getAttribute("holdingUsers");
-		if (users == null) {
-			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "检测到未登陆，请先登陆");
-			return mav;
-		}
-		if (users.getPower() > 2) {
-			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "检测非管理员账号，请切换账号");
-			return mav;
+		try{
+			judgePowerOfAdmin(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
 		}
 		mav.setViewName("AdminLogin");
 		return mav;
@@ -53,16 +45,11 @@ public class AdminController {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = req.getSession();
 		String accessPassword = "0000";
-		Users users = (Users) session.getAttribute("holdingUsers");
-		if (users == null) {
-			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "检测到未登陆，请先登陆");
-			return mav;
-		}
-		if (users.getPower() > 2) {
-			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "检测非管理员账号，请切换账号");
-			return mav;
+		try{
+			judgePowerOfAdmin(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
 		}
 		String input = req.getParameter("input");
 		if(!accessPassword.equals(input)) {
@@ -84,17 +71,11 @@ public class AdminController {
 	@RequestMapping(value="/adminBook")
 	public ModelAndView adminBook(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
-		HttpSession session = req.getSession();
-		Users users = (Users) session.getAttribute("holdingUsers");
-		if (users == null) {
-			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "检测到未登陆，请先登陆");
-			return mav;
-		}
-		if (users.getPower() > 2) {
-			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "检测非管理员账号，请切换账号");
-			return mav;
+		try{
+			judgePowerOfAdmin(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
 		}
 		List<Borrows> allborrrows = borrowsService.Adminlist();
 		Calendar now = Calendar.getInstance();
@@ -117,17 +98,11 @@ public class AdminController {
 	@RequestMapping(value="/adminAccount")
 	public ModelAndView adminAccount(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
-		HttpSession session = req.getSession();
-		Users users = (Users) session.getAttribute("holdingUsers");
-		if (users == null) {
-			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "检测到未登陆，请先登陆");
-			return mav;
-		}
-		if (users.getPower() > 2) {
-			mav.setViewName("redirect:/login");
-			mav.addObject("msg1", "检测非管理员账号，请切换账号");
-			return mav;
+		try{
+			judgePowerOfAdmin(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
 		}
 		List<Users> list = usersService.list();
 		mav.addObject("allUsers", list);
@@ -135,10 +110,46 @@ public class AdminController {
 		return mav;
 	}
 
+	@RequestMapping(value="/AdminAccountState")
+	public ModelAndView adminAccountState(HttpServletRequest req) {
+		ModelAndView mav = new ModelAndView();
+		try{
+			judgePowerOfAdmin(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
+		}
+		int id = Integer.parseInt(req.getParameter("operaId"));
+		int state = Integer.parseInt(req.getParameter("operaValue"));
+		usersService.updateState(id, state);
+		mav.setViewName("redirect:/adminAccount");
+		return mav;
+	}
+
+	@RequestMapping(value="/AdminAccountDelete")
+	public ModelAndView AdminAccountDelete(HttpServletRequest req){
+		ModelAndView mav = new ModelAndView();
+		try{
+			judgePowerOfAdmin(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
+		}
+		int id = Integer.parseInt(req.getParameter("operaId"));
+		usersService.delete(id);
+		mav.setViewName("redirect:/adminAccount");
+		return mav;
+	}
+
 	@RequestMapping("/AdminBorrowPage")
 	public ModelAndView toAdminBorrowPage(HttpServletRequest req){
 		ModelAndView modelAndView = new ModelAndView();
-		HttpSession session = req.getSession();
+		try{
+			judgePowerOfAdmin(req);
+		} catch (ErrorInformationException e){
+			modelAndView.addObject("msg1", e.getMessage());
+			return errorOutLogin(modelAndView, req);
+		}
 		String searchCode = (String)req.getParameter("searchBookCode");
 		String searchAccount = (String)req.getParameter("searchAccount");
 		List<Borrows> result = null;
@@ -170,6 +181,55 @@ public class AdminController {
 		modelAndView.addObject("AllBorrowList",result);
 		modelAndView.setViewName("AdminBorrowPage");
 		return modelAndView;
+	}
+
+	/*
+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	 */
+	public boolean judgePowerOfAdmin(HttpServletRequest req) throws ErrorInformationException{
+		if(!judgeAccountNormal(req)){
+			return false;
+		}
+		HttpSession session = req.getSession();
+		Users users = (Users) session.getAttribute("holdingUsers");
+		if (users.getPower() > 2) {
+			throw new ErrorInformationException("检测非管理员账号，请切换账号");
+		}
+		return true;
+	}
+	public boolean judgeAccountNormal(HttpServletRequest req) throws ErrorInformationException{
+		HttpSession session = req.getSession();
+		String sessionID = session.getId();
+		Users users = (Users) session.getAttribute("holdingUsers");
+		if (users == null) {
+			throw new ErrorInformationException("检测到未登陆，请先登陆");
+		}
+		if(System.currentTimeMillis() - users.getLastActivityTime() >= (5*60*1000)){
+			throw new ErrorInformationException("长时间未响应，请重新登陆");
+		}
+		Users tempUser = usersService.get(users.getAccount());
+		if(tempUser == null){
+			throw new ErrorInformationException("该账户已经被注销，请重新注册");
+		} else if(tempUser.getState() == 0){
+			throw new ErrorInformationException("该账户已经被冻结，请联系管理员");
+		}
+		users.updateLastActivityTime();
+		session.setAttribute("holdingUsers",users);
+		return true;
+	}
+	public ModelAndView errorOutLogin(ModelAndView mav, HttpServletRequest req){
+		mav.setViewName("redirect:/login");
+		accountDis(req);
+		return mav;
+	}
+	public void accountDis(HttpServletRequest req){
+		HttpSession session = req.getSession();
+		Users users = (Users)session.getAttribute("holdingUsers");
+		if(session.getId().equals(UsersMapHolding.USR_SESSION.get(users.getAccount()))){
+			UsersMapHolding.USR_SESSION.remove(users.getAccount());
+			UsersMapHolding.SESSIONID_USR.remove(session.getId());
+		}
+		session.setAttribute("holdingUsers", null);
 	}
 
 }

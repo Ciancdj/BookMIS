@@ -35,11 +35,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   		</div>
   	</nav><br/><br/>
   	<main role="main" class="container">
-      <div class="jumbotron">
-        <h1>系统提醒：</h1>
-        <p class="lead">${holdingUsers.account}账户注册成功</p>
-        <a class="btn btn-lg btn-primary" href="../search" role="button">请点击该处进行跳转 &raquo;</a>
-      </div>
+        <div class="jumbotron">
+            <h1>系统提醒：</h1>
+            <p class="lead">${holdingUsers.account}账户注册成功</p>
+            <a class="btn btn-lg btn-primary" href="../search" role="button">请点击该处进行跳转 &raquo;</a>
+        </div>
+        <meta http-equiv="refresh" content="5;URL=../search">
     </main>
   </body>
 </html>

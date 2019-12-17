@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import model.pojo.Users;
+import model.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,13 +24,23 @@ import model.service.ListsService;
 
 @Controller
 public class ListsController {
-
+	@Autowired
+	UsersService usersService;
 	@Autowired
 	ListsService listsService;
 
 	@RequestMapping(value="/result")
 	public ModelAndView getResult(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView();
+		HttpSession session = req.getSession();
+		Users users = (Users)session.getAttribute("holdingUsers");
+		if(users != null){
+			try{
+				judgeAccountNormal(req);
+			} catch (ErrorInformationException e){
+				accountDis(req);
+			}
+		}
 		String way = req.getParameter("ways");
 		String input = req.getParameter("input");
 		if (way != null && input != null) {
@@ -109,6 +121,15 @@ public class ListsController {
 	public ModelAndView getList(HttpServletRequest req) {
 		int limitPage = 9;
 		ModelAndView mav = new ModelAndView("Return");
+		HttpSession session = req.getSession();
+		Users users = (Users)session.getAttribute("holdingUsers");
+		if(users != null){
+			try{
+				judgeAccountNormal(req);
+			} catch (ErrorInformationException e){
+				accountDis(req);
+			}
+		}
 		String method = req.getParameter("key1");
 		String ParentID = req.getParameter("key2");
 		if (method != null || ParentID != null) {
@@ -116,7 +137,6 @@ public class ListsController {
 			List<Lists> list = listsService.list(method, ParentID);
 			if(list == null)
 				return mav;
-			HttpSession session = req.getSession();
 			int len = list.size();
 			int maxPage;
 			int tempLen = len - 1;
@@ -152,9 +172,17 @@ public class ListsController {
 	public ModelAndView switchPage(HttpServletRequest req) {
 		int limitPage = 9;
 		ModelAndView mav = new ModelAndView("Return");
+		HttpSession session = req.getSession();
+		Users users = (Users)session.getAttribute("holdingUsers");
+		if(users != null){
+			try{
+				judgeAccountNormal(req);
+			} catch (ErrorInformationException e){
+				accountDis(req);
+			}
+		}
 		int page = Integer.parseInt(req.getParameter("page"));
 		int index = (page-1) * limitPage + 1;
-		HttpSession session = req.getSession();
 		List<Lists> rL = new ArrayList<Lists>();
 		List<Lists> list = (List<Lists>) session.getAttribute("GetList");
 		int maxPage = (int) session.getAttribute("maxPage");
@@ -179,5 +207,54 @@ public class ListsController {
 			mav.addObject("rightPage",maxPage);
 		}
 		return mav;
+	}
+
+	/*
+      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+     */
+	public boolean judgePowerOfAdmin(HttpServletRequest req) throws ErrorInformationException{
+		if(!judgeAccountNormal(req)){
+			return false;
+		}
+		HttpSession session = req.getSession();
+		Users users = (Users) session.getAttribute("holdingUsers");
+		if (users.getPower() > 2) {
+			throw new ErrorInformationException("检测非管理员账号，请切换账号");
+		}
+		return true;
+	}
+	public boolean judgeAccountNormal(HttpServletRequest req) throws ErrorInformationException{
+		HttpSession session = req.getSession();
+		String sessionID = session.getId();
+		Users users = (Users) session.getAttribute("holdingUsers");
+		if (users == null) {
+			throw new ErrorInformationException("检测到未登陆，请先登陆");
+		}
+		if(System.currentTimeMillis() - users.getLastActivityTime() >= (5*60*1000)){
+			throw new ErrorInformationException("长时间未响应，请重新登陆");
+		}
+		Users tempUser = usersService.get(users.getAccount());
+		if(tempUser == null){
+			throw new ErrorInformationException("该账户已经被注销，请重新注册");
+		} else if(tempUser.getState() == 0){
+			throw new ErrorInformationException("该账户已经被冻结，请联系管理员");
+		}
+		users.updateLastActivityTime();
+		session.setAttribute("holdingUsers",users);
+		return true;
+	}
+	public ModelAndView errorOutLogin(ModelAndView mav, HttpServletRequest req){
+		mav.setViewName("redirect:/login");
+		accountDis(req);
+		return mav;
+	}
+	public void accountDis(HttpServletRequest req){
+		HttpSession session = req.getSession();
+		Users users = (Users)session.getAttribute("holdingUsers");
+		if(session.getId().equals(UsersMapHolding.USR_SESSION.get(users.getAccount()))){
+			UsersMapHolding.USR_SESSION.remove(users.getAccount());
+			UsersMapHolding.SESSIONID_USR.remove(session.getId());
+		}
+		session.setAttribute("holdingUsers", null);
 	}
 }

@@ -1,15 +1,14 @@
 package Control.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import model.encryption.Decode;
 import model.encryption.EncryKey;
+import model.pojo.Borrows;
+import model.service.BorrowsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +25,8 @@ import java.security.NoSuchAlgorithmException;
 public class UsersController {
 	@Autowired
 	UsersService usersService;
+	@Autowired
+	BorrowsService borrowsService;
 
 	@RequestMapping(value="/login")
 	public ModelAndView LoginView() {
@@ -36,18 +37,10 @@ public class UsersController {
 		return mav;
 	}
 
-	@RequestMapping(value="/listUsers")
-	public ModelAndView listUsers() {
-		ModelAndView mav = new ModelAndView();
-		List<Users> users = usersService.list();
-		mav.addObject("users", users);
-		mav.setViewName("listUsers");
-		return mav;
-	}
-
 	@RequestMapping(value="/login/Testing")
 	public ModelAndView LoginTesting(Users input, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
+		mav.setViewName("redirect:/login");
 		mav.addObject("msg1", "");
 		mav.addObject("msg2", "");
 		String account = input.getAccount();
@@ -65,8 +58,47 @@ public class UsersController {
 			mav.addObject("msg2", "密码错误，请重新输出");
 		}
 		if(user != null && user.getPassword().equals(password)){
+			if(user.getState() == 0){
+				mav.addObject("msg2", "该账户已经被冻结，请联系管理员000");
+				return mav;
+			}
+			// 以借阅书籍显示
+			List<Borrows> myborrrows = borrowsService.list(user.getId());
+			Calendar cal = Calendar.getInstance();
+			int overTimeNum = 0;
+			for (Borrows single : myborrrows){
+				cal.setTime(single.getBorrowerdate());
+				// 借阅超时，冻结处理
+				if(((System.currentTimeMillis() - cal.getTimeInMillis()) / (1000*60*60*24)) >= single.getFreeday()){
+					usersService.updateState(user.getId(), 0);
+					mav.addObject("msg2", "该账户已经被冻结，请联系管理员");
+						return mav;
+				}
+				if((single.getFreeday()-(((System.currentTimeMillis() - cal.getTimeInMillis()) / (1000*60*60*24))) <= 5) &&
+						(single.getFreeday()-(((System.currentTimeMillis() - cal.getTimeInMillis()) / (1000*60*60*24))) >= 0)){
+					overTimeNum++;
+				}
+			}
 			mav.addObject("user", user);
 			HttpSession session = request.getSession(true);
+			if(overTimeNum>0){
+//				System.out.println("overTimeNum " + overTimeNum);
+				mav.addObject("overTimeBookInformation","当前用户共借阅"+myborrrows.size()+
+						"本书 有" + overTimeNum + "本书将要过期，请尽快归还，如果未在规定时间内归还，则将会冻结该账户");
+			}
+			String tempSessionId = UsersMapHolding.USR_SESSION.get(user.getAccount());
+			// 确认是否有其他账号已经登陆
+			if(tempSessionId!=null){
+				// 判断已登录得账户是否超时
+				if(System.currentTimeMillis() -
+						UsersMapHolding.SESSIONID_USR.get(tempSessionId).getLastActivityTime() < (5*60*1000)){
+					mav.addObject("msg2", "账户已经被登陆");
+					return mav;
+				}
+			}
+			UsersMapHolding.USR_SESSION.put(user.getAccount(),session.getId());
+			UsersMapHolding.SESSIONID_USR.put(session.getId(), user);
+			user.updateLastActivityTime();
 			session.setAttribute("holdingUsers", user);
 			int TempNum = 0;
 			List<TemporaryBook> TempList = new ArrayList<TemporaryBook>();
@@ -74,8 +106,6 @@ public class UsersController {
 			session.setAttribute("TempList", TempList);
 			session.setAttribute("loginErrorTime", 0);
 			mav.setViewName("SuccessLogin");
-		} else {
-			mav.setViewName("redirect:/login");
 		}
 		return mav;
 	}
@@ -93,6 +123,15 @@ public class UsersController {
 	public ModelAndView OutLogin(HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView("redirect:/search");
 		HttpSession session = request.getSession();
+		Users users = (Users)session.getAttribute("holdingUsers");
+		try{
+			judgeAccountNormal(request);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, request);
+		}
+		UsersMapHolding.USR_SESSION.remove(users.getAccount());
+		UsersMapHolding.SESSIONID_USR.remove(session.getId());
 		session.setAttribute("holdingUsers", null);
 		return mav;
 	}
@@ -144,6 +183,9 @@ public class UsersController {
 		input.setPassword(MD5(Decode.decode(input.getPassword())));
 		usersService.add(input);
 		HttpSession session = request.getSession(true);
+		UsersMapHolding.USR_SESSION.put(input.getAccount(),session.getId());
+		UsersMapHolding.SESSIONID_USR.put(session.getId(), input);
+		input.updateLastActivityTime();
 		session.setAttribute("holdingUsers", input);
 		int TempNum = 0;
 		List<TemporaryBook> TempList = new ArrayList<TemporaryBook>();
@@ -176,12 +218,24 @@ public class UsersController {
 	@RequestMapping(value="/InformChange")
 	public ModelAndView ChangeInform(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("InformInstall");
+		try{
+			judgeAccountNormal(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
+		}
 		return mav;
 	}
 
 	@RequestMapping(value="/InformChange/input")
 	public ModelAndView ChangeInformInput(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("ReturnPage");
+		try{
+			judgeAccountNormal(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
+		}
 		String changename = req.getParameter("changename");
 		String changephone = req.getParameter("changephone");
 		String nowchangename = req.getParameter("nowchangename");
@@ -211,6 +265,12 @@ public class UsersController {
 	@RequestMapping(value="/changePassword")
 	public ModelAndView ChangePassword(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("PasswordInstall");
+		try{
+			judgeAccountNormal(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
+		}
 		mav.addObject("exponent", EncryKey.getKu().getE().toString());
 		mav.addObject("modulus", EncryKey.getKu().getN().toString());
 		return mav;
@@ -219,6 +279,12 @@ public class UsersController {
 	@RequestMapping(value="/changePassword/input")
 	public ModelAndView ChangePasswordInput(HttpServletRequest req) {
 		ModelAndView mav = new ModelAndView("ReturnPage");
+		try{
+			judgeAccountNormal(req);
+		} catch (ErrorInformationException e){
+			mav.addObject("msg1", e.getMessage());
+			return errorOutLogin(mav, req);
+		}
 		String nowPassword = req.getParameter("nowPassword");
 		nowPassword = MD5(Decode.decode(nowPassword));
 		int id = Integer.parseInt(req.getParameter("id"));
@@ -239,24 +305,52 @@ public class UsersController {
 		return mav;
 	}
 
-//	@RequestMapping(value="/login/success")
-//	public ModelAndView Loginsuccess(Users user, HttpServletRequest request) {
-//		ModelAndView mav = new ModelAndView();
-//		Users u = (Users) request.getAttribute("user");
-//		System.out.println(u == null);
-//		System.out.println(user.getAccount() + " + " + user.getPassword());
-//		System.out.println("---------------------");
-//		mav.setViewName("SuccessLogin");
-//		return mav;
-//	}
-
-
-//	@RequestMapping(value="/register/success")
-//	public ModelAndView Registersuccess(Users user, HttpServletRequest request) {
-//		ModelAndView mav = new ModelAndView();
-//		HttpSession session = request.getSession();
-//		session.setAttribute("holdingUsers", user);
-//		mav.setViewName("SuccessRegister");
-//		return mav;
-//	}
+	/*
+        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+         */
+	public boolean judgePowerOfAdmin(HttpServletRequest req) throws ErrorInformationException{
+		if(!judgeAccountNormal(req)){
+			return false;
+		}
+		HttpSession session = req.getSession();
+		Users users = (Users) session.getAttribute("holdingUsers");
+		if (users.getPower() > 2) {
+			throw new ErrorInformationException("检测非管理员账号，请切换账号");
+		}
+		return true;
+	}
+	public boolean judgeAccountNormal(HttpServletRequest req) throws ErrorInformationException{
+		HttpSession session = req.getSession();
+		String sessionID = session.getId();
+		Users users = (Users) session.getAttribute("holdingUsers");
+		if (users == null) {
+			throw new ErrorInformationException("检测到未登陆，请先登陆");
+		}
+		if(System.currentTimeMillis() - users.getLastActivityTime() >= (5*60*1000)){
+			throw new ErrorInformationException("长时间未响应，请重新登陆");
+		}
+		Users tempUser = usersService.get(users.getAccount());
+		if(tempUser == null){
+			throw new ErrorInformationException("该账户已经被注销，请重新注册");
+		} else if(tempUser.getState() == 0){
+			throw new ErrorInformationException("该账户已经被冻结，请联系管理员");
+		}
+		users.updateLastActivityTime();
+		session.setAttribute("holdingUsers",users);
+		return true;
+	}
+	public ModelAndView errorOutLogin(ModelAndView mav, HttpServletRequest req){
+		mav.setViewName("redirect:/login");
+		accountDis(req);
+		return mav;
+	}
+	public void accountDis(HttpServletRequest req){
+		HttpSession session = req.getSession();
+		Users users = (Users)session.getAttribute("holdingUsers");
+		if(session.getId().equals(UsersMapHolding.USR_SESSION.get(users.getAccount()))){
+			UsersMapHolding.USR_SESSION.remove(users.getAccount());
+			UsersMapHolding.SESSIONID_USR.remove(session.getId());
+		}
+		session.setAttribute("holdingUsers", null);
+	}
 }
